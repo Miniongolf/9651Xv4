@@ -1,16 +1,17 @@
 #include "subHeads/auton/autonFuncts.hpp"
+#include "subHeads/opcontrol/opcontrolHelpers.hpp"
 
 // Helper movement functions
-void chassisMovePowers(int leftPower, int rightPower, int time) {
+void chassisMovePowers(int leftPower, int rightPower, int time, bool wait) {
     chassis.waitUntilDone();
     chassis.tank(leftPower, rightPower);
     pros::delay(time);
     chassis.tank(0, 0);
 }
 
-void chassisRam(bool ) {
-    chassisMovePowers(40, 40, 750);
-    chassisMovePowers(-70, -70, 500);
+void chassisRam(bool forwards) {
+    chassisMovePowers(50, 50, 400);
+    chassisMovePowers(-127, -127, 400, false);
 }
 
 // Auton selector functions
@@ -72,6 +73,58 @@ void farElim_funct() {
     // chassis.setPose(46, -9, 44);
 }
 
-void skillsAuton_funct() {
+void skillsAuton_funct(bool isDriver) {
     std::cout << "Auton skills\n";
+
+    chassis.setPose(-45, -57, 135);
+
+    // Score preloads
+    chassis.moveToPose(-60, -28, 180, 1000, {.forwards = false, .minSpeed = 100});
+    chassisRam();
+    chassis.setPose(-60, -32, 180); // odom reset on net
+
+    // Move to shooting position
+    chassis.moveToPose(-56, -47, -115, 2000, {.maxSpeed = 70}); // Move to matchload bar
+    wings.extend(WingsStateMachine::FRONT); // Extend front wings
+
+    // Matchload 50 triballs (max 30 seconds)
+    cata.matchload(50, 1'800'000);
+
+    while (cata.getIsMatchloading()) {
+        if (isDriver) {
+            gamepad1.update();
+            drive(gamepad1);
+            if (gamepad1.x.pressed) break;
+        }
+        pros::delay(20);
+    }
+
+    cata.idle();
+    wings.retract(WingsStateMachine::FRONT);
+
+    if (isDriver) return; // Exit early if driver control
+
+    // Cross to other side
+    chassis.moveToPoint(-29, -58, 2000, {.forwards = false}); // Interpolate to bowling position
+    chassis.moveToPose(-32, -58, -90, 2000, {.forwards = false}); // Move to bowling position
+    debug::printPose();
+    chassis.moveToPose(45, -58, -90, 2000, {.forwards = false, .minSpeed = 70, .earlyExitRange = 24});
+
+    // Right push
+    chassis.moveToPose(48, -48, -135, 1000, {.forwards = false, .minSpeed = 70, .earlyExitRange = 10});
+    chassis.moveToPose(60, -20, 180, 2000, {.forwards = false, .minSpeed = 127});
+    chassisRam();
+
+    // Middle push 1
+    chassisMovePowers(50, 50, 750);
+    chassis.turnToHeading(-45, 1000);
+    chassis.moveToPoint(29, -33, 2000);
+    chassis.moveToPose(18, -10, 0, 2000);
+    chassis.waitUntilDone();
+    wings.extend(WingsStateMachine::FRONT);
+    chassis.moveToPose(38, -7, 90, 2000);
+    chassisMovePowers(50, 50, 400);
+    chassis.arcade(0, 0);
+
+    while (true) pros::delay(50);
 }

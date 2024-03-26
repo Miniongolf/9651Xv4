@@ -66,7 +66,7 @@ void CataStateMachine::cancelEmergencyStop() {
     this->state = STATE::IDLE;
 }
 
-void CataStateMachine::matchload(int millis, int triballs) {
+void CataStateMachine::matchload(int triballs, int millis) {
     this->timer.set(millis);
     this->timer.resume();
     this->triballsLeft = triballs;

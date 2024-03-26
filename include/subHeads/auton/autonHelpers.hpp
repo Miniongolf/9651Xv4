@@ -2,6 +2,17 @@
 
 #include "main.h"
 
+// Auton selection enum
+enum class AutoSelect {
+    skills = 0,
+    closeQual = 1,
+    closeSafe = 2,
+    closeElim = 3,
+    farQual = -1,
+    farSafe = -2,
+    farElim = -3
+};
+
 constexpr float intakeOffset = 9.0;
 
 namespace debug {

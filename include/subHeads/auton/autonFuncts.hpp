@@ -10,7 +10,7 @@
  * @param rightPower The power for the right motor [-127, 127]
  * @param time The amount of time to wait
  */
-void chassisMovePowers(int leftPower, int rightPower, int time);
+void chassisMovePowers(int leftPower, int rightPower, int time, bool wait = true);
 
 void chassisRam(bool forwards = false);
 
@@ -21,4 +21,4 @@ void closeElim_funct();
 void farQual_funct();
 void farSafe_funct();
 void farElim_funct();
-void skillsAuton_funct();
+void skillsAuton_funct(bool isDriver = false);

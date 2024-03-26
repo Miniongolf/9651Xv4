@@ -7,9 +7,17 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+    // Init auton selector
+    selector::init();
+
+    // Init chassis
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
     chassis.calibrate();
+
+    // Retract wings
     wings.retract(WingsStateMachine::FRONT);
     wings.retract(WingsStateMachine::BACK);
+
     hang.idle();
 }
 

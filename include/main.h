@@ -37,6 +37,7 @@
 #include "api.h"
 
 #include "lemlib/api.hpp"
+#include "nicklib/api.hpp"
 #include "autoSelect/selection.h"
 
 #include "globals.hpp"

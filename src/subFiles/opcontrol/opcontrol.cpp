@@ -1,4 +1,6 @@
 #include "main.h"
+#include "subHeads/opcontrol/opcontrolHelpers.hpp"
+#include "subHeads/auton/autonFuncts.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
@@ -17,14 +19,29 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+    std::cout << "opcontrol\n";
+    DriveModes driveMode = DriveModes::NORMAL;
+
+    // Run auton skills with canceling option if skills is selected in the auton selector
+    if (static_cast<AutoSelect>(selector::auton) == AutoSelect::skills) {
+        skillsAuton_funct(true);
+    }
+
+    intake.grabBall();
+    while (gamepad1.dpadLeft) {
+        pros::delay(20);
+    }
+
     while (true) {
+        updateAllSystems();
+
         // Cata
         if (gamepad1.x.pressed) { (cata.getIsFiring()) ? cata.idle() : cata.fire(); }
 
         // Wings
-        (gamepad1.dpadDown.pressed || gamepad1.lt.pressed) ? wings.extend(WingsStateMachine::LEFT) : wings.retract(WingsStateMachine::LEFT);
-        (gamepad1.b.pressed || gamepad1.lt.pressed) ? wings.extend(WingsStateMachine::RIGHT) : wings.retract(WingsStateMachine::RIGHT);
-        (gamepad1.lb.pressed) ? wings.extend(WingsStateMachine::BACK) : wings.retract(WingsStateMachine::BACK);
+        (gamepad1.dpadDown || gamepad1.lt) ? wings.extend(WingsStateMachine::LEFT) : wings.retract(WingsStateMachine::LEFT);
+        (gamepad1.b || gamepad1.lt) ? wings.extend(WingsStateMachine::RIGHT) : wings.retract(WingsStateMachine::RIGHT);
+        (gamepad1.lb) ? wings.extend(WingsStateMachine::BACK) : wings.retract(WingsStateMachine::BACK);
 
         // Hang
         if (gamepad1.dpadRight.pressed) hang.raise();
@@ -33,11 +50,22 @@ void opcontrol() {
         else hang.idle();
 
         // Intake
-        if (gamepad1.rt) intake.intake();
-        else if (gamepad1.rb) intake.outtake();
+        if (gamepad1.rb) intake.outtake();
+        else if (gamepad1.rt) intake.intake();
         else intake.idle();
+        std::cout << intake.getState() << '\n';
 
-
+        // Drivetrain
+        switch (driveMode) {
+            case DriveModes::NORMAL:
+                drive(gamepad1);
+                if (gamepad2.rb && gamepad2.rt) driveMode = DriveModes::TAKEOVER;
+                break;
+            case DriveModes::TAKEOVER:
+                drive(gamepad2);
+                if (!gamepad2.rb || !gamepad2.rt) driveMode = DriveModes::NORMAL;
+                break;
+        }
 
         pros::delay(10); // DO NOT DELETE
     }

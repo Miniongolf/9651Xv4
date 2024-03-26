@@ -14,6 +14,7 @@ void IntakeStateMachine::update() {
     if (this->isGrabbing) {
         if (this->timer.isDone() || this->hasBall()) {
             this->isGrabbing = false;
+            this->idle();
         }
     }
 
@@ -53,12 +54,11 @@ void IntakeStateMachine::cancelEmergencyStop() {
 }
 
 bool IntakeStateMachine::hasBall() const {
-    return this->motor->get_power() > this->wattageThreshold;
+    return (this->motor->get_power()) > (this->wattageThreshold);
 }
 
 void IntakeStateMachine::grabBall(int millis) {
     this->isGrabbing = true;
     this->intake();
     this->timer.set(millis);
-    this->idle();
 }

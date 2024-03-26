@@ -7,7 +7,7 @@ nicklib::Gamepad gamepad1(pros::E_CONTROLLER_MASTER);
 nicklib::Gamepad gamepad2(pros::E_CONTROLLER_PARTNER);
 
 // SENSORS
-pros::IMU imu(12);
+pros::IMU imu(18);
 // pros::Distance cataDistance(UNUSED_PORT);
 // pros::Distance leftDistance(UNUSED_PORT);
 // pros::Distance rightDistance(UNUSED_PORT);
@@ -29,7 +29,7 @@ pros::MotorGroup rightMotors({
 
 // SUBSYS STATE MACHINE
 CataStateMachine cata(5, pros::E_MOTOR_GEAR_GREEN);
-IntakeStateMachine intake(19, pros::E_MOTOR_GEAR_GREEN);
+IntakeStateMachine intake(-12, pros::E_MOTOR_GEAR_GREEN);
 WingsStateMachine wings('G', 'H', 'F');
 HangStateMachine hang(0, pros::E_MOTOR_GEAR_GREEN, 'A');
 
@@ -69,7 +69,7 @@ lemlib::OdomSensors odomSensors(nullptr,
                                 nullptr,
                                 nullptr,
                                 nullptr,
-                                &imu // inertial sensor
+                                nullptr // inertial sensor
 );
 
 lemlib::Chassis chassis(drivetrain, lateralController, angularController, odomSensors);

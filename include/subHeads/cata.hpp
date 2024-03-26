@@ -53,7 +53,7 @@ class CataStateMachine {
          * @param millis max amount of time the catapult will spend matchloading
          * @param triballs how many triballs to fire
          */
-        void matchload(int millis = INT32_MAX, int triballs = -1);
+        void matchload(int triballs = -1, int millis = INT32_MAX);
 
         bool getIsFiring();
         bool getIsMatchloading();
